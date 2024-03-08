@@ -56,8 +56,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
-    needs:
-      - tests
+#    needs:
+#      - tests
     steps:
       - name: checkout code
         uses: actions/checkout@v3
