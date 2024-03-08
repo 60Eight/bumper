@@ -1,4 +1,4 @@
-FROM --platform=${BUILDPLATFORM:-linux/amd64} python:3.10-alpine
+FROM --platform=linux/arm64 python:3.10-alpine
 
 EXPOSE 443
 EXPOSE 5223
@@ -8,7 +8,7 @@ EXPOSE 8883
 COPY requirements.txt /requirements.txt
 
 # install required python packages
-RUN apk add git && pip3 install -r requirements.txt
+RUN apk add git build-base && pip3 install -r requirements.txt
 
 WORKDIR /bumper
 
