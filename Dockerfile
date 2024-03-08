@@ -5,12 +5,12 @@ EXPOSE 5223
 EXPOSE 8007
 EXPOSE 8883
 
-COPY requirements.txt /requirements.txt
-
 # install required python packages
 RUN apt-get update && apt-get install git build-essential -y
 
 FROM --platform=linux/arm64 python:3.10-slim
+
+COPY requirements.txt /requirements.txt
 
 # install required python packages
 RUN pip3 install -r requirements.txt
