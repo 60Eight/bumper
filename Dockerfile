@@ -1,6 +1,4 @@
-ARG ARCH=amd64
-
-FROM $ARCH/python:3.10-alpine
+FROM --platform=$BUILDPLATFORM python:3.10-alpine
 
 EXPOSE 443
 EXPOSE 5223
