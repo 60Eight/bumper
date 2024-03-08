@@ -1,19 +1,14 @@
-FROM --platform=linux/arm64 python:3.10 AS builder
+FROM --platform=linux/arm/v7 python:3.10
 
 EXPOSE 443
 EXPOSE 5223
 EXPOSE 8007
 EXPOSE 8883
 
-# install required python packages
-RUN apt-get update && apt-get install git build-essential -y
-
-FROM --platform=linux/arm64 python:3.10-slim
-
 COPY requirements.txt /requirements.txt
 
 # install required python packages
-RUN apt-get install git -y && pip3 install -r requirements.txt
+RUN apt-get update && apt-get install git build-essential -y && pip3 install -r requirements.txt
 
 WORKDIR /bumper
 
