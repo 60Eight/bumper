@@ -13,7 +13,7 @@ FROM --platform=linux/arm64 python:3.10-slim
 COPY requirements.txt /requirements.txt
 
 # install required python packages
-RUN pip3 install -r requirements.txt
+RUN apt-get install git -y && pip3 install -r requirements.txt
 
 WORKDIR /bumper
 
