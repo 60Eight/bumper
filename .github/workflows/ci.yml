@@ -54,33 +54,36 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions:
+      packages: write
+      contents: read
 #    needs:
 #      - tests
     steps:
-      - name: checkout code
-        uses: actions/checkout@v3
+      # https://github.com/actions/checkout
+      - uses: actions/checkout@v4
 
-      - name: Get tag name
-        shell: bash
-        run: |
-          BRANCH=${{ github.ref_name }}
-          if [ -z $BRANCH ]; then
-            exit 1;
-          elif  [ $BRANCH == "master" ]; then
-            BRANCH=latest;
-          fi
-
-          echo "##[set-output name=tag;]$(echo $BRANCH)"
-        id: tag_name
+      # https://github.com/docker/metadata-action
+      - name: Extract Docker metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=raw,value=${{ github.ref_name }}
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha
 
       # https://github.com/docker/setup-qemu-action
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-
+        uses: docker/setup-qemu-action@v3
       # https://github.com/docker/setup-buildx-action
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       # https://github.com/docker/login-action
       - name: Login to registry ghcr.io
@@ -89,10 +92,19 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          logout: false
 
-      - name: Build the image
-        run: |
-          docker buildx build --push \
-          --tag ghcr.io/60eight/bumper:${{ steps.tag_name.outputs.tag }} \
-          --platform linux/amd64,linux/arm/v7,linux/arm64 .
+      # https://github.com/docker/build-push-action
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          build-args: |
+            BUILDTIME=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
+            VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
+            REVISION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
