@@ -1,4 +1,4 @@
-FROM python:3.10-alpine
+FROM --platform=$BUILDPLATFORM python:3.10-alpine as build
 
 EXPOSE 443
 EXPOSE 5223
