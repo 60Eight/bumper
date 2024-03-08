@@ -8,7 +8,7 @@ EXPOSE 8883
 COPY requirements.txt /requirements.txt
 
 # install required python packages
-RUN apt-get update && apt-get install git build-essential && pip3 install -r requirements.txt
+RUN apt-get update && apt-get install git build-essential -y && pip3 install -r requirements.txt
 
 WORKDIR /bumper
 
