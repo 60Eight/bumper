@@ -1,4 +1,4 @@
-FROM --platform=linux/arm/v7 python:3.10-alpine as build
+FROM --platform=linux/arm64 python:3.10-alpine as build
 
 EXPOSE 443
 EXPOSE 5223
